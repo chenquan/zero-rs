@@ -16,6 +16,12 @@ use volo::net::Address;
 use num_integer::Roots;
 use volo::new_type;
 
+const INIT_SUCCESS: i64 = 1000;
+const THROTTLE_SUCCESS: i64 = INIT_SUCCESS / 2;
+const PENALTY: i64 = i64::MAX;
+const FORCE_PICK: i64 = time::Duration::SECOND.as_millis() as i64;
+
+
 pub struct P2c<K>
     where K: Hash + PartialEq + Eq + Send + Sync + 'static
 
@@ -74,11 +80,6 @@ impl InstancePicker {
         Self { conns }
     }
 }
-
-const INIT_SUCCESS: i64 = 1000;
-const THROTTLE_SUCCESS: i64 = INIT_SUCCESS / 2;
-const PENALTY: i64 = i64::MAX;
-const forcePick: time::Duration = time::Duration::SECOND;
 
 
 struct SubConn {
@@ -149,9 +150,12 @@ impl InstancePicker {
         }
 
         let pick = c2.pick.load(Ordering::SeqCst);
-        // forcePick.as_millis() as i64
-        // if now - pick >forcePick &&
-        c2.pick.compare_and_swap(pick, now, Ordering::SeqCst);
+        if now - pick > FORCE_PICK
+            && c2.pick.compare_and_swap(pick, now, Ordering::SeqCst) == pick {
+            return c2;
+        }
+
+        c1.last.store(now, Ordering::SeqCst);
         c1
     }
 }
