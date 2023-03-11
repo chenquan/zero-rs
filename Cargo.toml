@@ -1,0 +1,22 @@
+[package]
+name = "zero-rs"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1"
+async-trait = "0.1"
+lazy_static = "1"
+tokio = { version = "1", features = ["full"] }
+tracing = "0.1"
+prost = "0.11"
+tracing-subscriber = "0.3"
+url = "2"
+pilota = "*"      # we recommend to use the latest framework version for new features and bug fixes
+volo = "*"        # we recommend to use the latest framework version for new features and bug fixes
+volo-grpc = "*"   # we recommend to use the latest framework version for new features and bug fixes
+async-broadcast = "0.5"
+etcd-client = "0.10"
+dashmap = "5"
