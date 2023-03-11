@@ -149,7 +149,7 @@ impl InstancePicker {
         }
 
         let pick = c2.pick.load(Ordering::SeqCst);
-        forcePick.as_millis() as i64
+        // forcePick.as_millis() as i64
         // if now - pick >forcePick &&
         c2.pick.compare_and_swap(pick, now, Ordering::SeqCst);
         c1
