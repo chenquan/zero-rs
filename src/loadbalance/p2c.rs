@@ -113,16 +113,17 @@ impl Iterator for InstancePicker {
     type Item = Address;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let conns = &self.conns;
+        // let conns = &self.conns;
+        let conns = Arc::clone(&self.conns);
         match conns.len() {
             0 => {
                 None
             }
             1 => {
-                Some(conns[0].instance.address.clone())
+                Some(self.choose(&conns[0], None).instance.address.clone())
             }
             2 => {
-                None
+                Some(self.choose(&conns[0], None).instance.address.clone())
             }
             _ => {
                 None
@@ -132,7 +133,7 @@ impl Iterator for InstancePicker {
 }
 
 impl InstancePicker {
-    fn choose(&self, c1: SubConn, c2: Option<SubConn>) -> SubConn {
+    fn choose<'a>(&'a self, c1: &'a SubConn, c2: Option<&'a SubConn>) -> &SubConn {
         let now = chrono::Utc::now().timestamp();
         if c2.is_none() {
             c1.last.store(now, Ordering::SeqCst);
@@ -144,7 +145,7 @@ impl InstancePicker {
         let mut c2 = c2;
 
         if c1.load() > c2.load() {
-            let t = c1;
+            let mut t = c1;
             c1 = c2;
             c2 = t;
         }
