@@ -1,6 +1,7 @@
 use std::future::Future;
 use std::hash::Hash;
 use std::marker::PhantomData;
+use std::net::{Ipv4Addr, SocketAddrV4};
 use std::sync::{Arc, Mutex};
 use std::time;
 use std::sync::atomic::{AtomicI64, AtomicU64, Ordering};
@@ -113,7 +114,6 @@ impl Iterator for InstancePicker {
     type Item = Address;
 
     fn next(&mut self) -> Option<Self::Item> {
-        // let conns = &self.conns;
         let conns = Arc::clone(&self.conns);
         match conns.len() {
             0 => {
@@ -123,7 +123,7 @@ impl Iterator for InstancePicker {
                 Some(self.choose(&conns[0], None).instance.address.clone())
             }
             2 => {
-                Some(self.choose(&conns[0], None).instance.address.clone())
+                Some(self.choose(&conns[0], Some(&conns[1])).instance.address.clone())
             }
             _ => {
                 None
@@ -139,10 +139,9 @@ impl InstancePicker {
             c1.last.store(now, Ordering::SeqCst);
             return c1;
         }
-        let c2 = c2.unwrap();
 
         let mut c1 = c1;
-        let mut c2 = c2;
+        let mut c2 = c2.unwrap();
 
         if c1.load() > c2.load() {
             let mut t = c1;
@@ -159,4 +158,19 @@ impl InstancePicker {
         c1.last.store(now, Ordering::SeqCst);
         c1
     }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use std::future::join;
+    use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
+    use std::sync::{Arc, mpsc};
+    use std::thread;
+    use volo::discovery::Instance;
+    use volo::net::Address;
+    use crate::loadbalance::p2c::SubConn;
+
+    #[test]
+    fn instance_picker() {}
 }
