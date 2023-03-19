@@ -20,3 +20,5 @@ volo-grpc = "*"   # we recommend to use the latest framework version for new fea
 async-broadcast = "0.5"
 etcd-client = "0.10"
 dashmap = "5"
+chrono="0.4"
+num-integer="0.1"
