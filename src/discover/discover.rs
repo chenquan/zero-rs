@@ -187,21 +187,8 @@ impl Discover for EtcdDiscover {
 }
 
 
-fn to_vec_instance(kv: &[KeyValue]) -> Vec<Arc<Instance>> {
-    kv.iter().filter_map(|kv| kv.value_str().map(|s| s.to_string()).ok())
-        .filter_map(|t| {
-            t.to_socket_addrs().ok()
-        })
-        .flat_map(|x| x.into_iter())
-        .map(|x| {
-            Arc::new(
-                Instance {
-                    address: Address::Ip(x),
-                    weight: 1,
-                    tags: Default::default(),
-                }
-            )
-        }).collect()
+fn to_vec_instance(kvs: &[KeyValue]) -> Vec<Arc<Instance>> {
+    kvs.iter().filter_map(|kv| to_instance(kv)).collect()
 }
 
 fn to_instance(x: &KeyValue) -> Option<Arc<Instance>> {
