@@ -78,7 +78,7 @@ impl Discover for EtcdDiscover {
         self.service_name.clone().to_string()
     }
 
-    fn watch(&self) -> Option<Receiver<Change<Self::Key>>> {
+    fn watch(&self, _keys: Option<&[Self::Key]>) -> Option<Receiver<Change<Self::Key>>> {
         let (sender, receiver) = async_broadcast::broadcast(2);
         let service_name = self.service_name.clone();
         let mut client = self.client.clone();
