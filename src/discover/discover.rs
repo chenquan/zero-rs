@@ -207,7 +207,7 @@ impl Discover for EtcdDiscover {
 }
 
 fn to_vec_instance(kvs: &[KeyValue]) -> Vec<Arc<Instance>> {
-    kvs.iter().filter_map(|kv| to_instance(kv)).collect()
+    kvs.iter().filter_map(to_instance).collect()
 }
 
 fn to_instance(x: &KeyValue) -> Option<Arc<Instance>> {
